@@ -1,1 +1,50 @@
-Docker Compose for local dev
+version: "3.8"
+services:
+  redis:
+    image: redis:7
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6380:6379"
+
+  controller-api:
+    build:
+      context: ..
+      dockerfile: deployments/docker/controller-api.Dockerfile
+    working_dir: /app
+    volumes:
+      - ../:/app
+    environment:
+      - REDIS_HOST=redis
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+
+  scheduler:
+    build:
+      context: ..
+      dockerfile: deployments/docker/scheduler.Dockerfile
+    working_dir: /app
+    volumes:
+      - ../:/app
+    environment:
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+
+  scanner-worker:
+    build:
+      context: ..
+      dockerfile: deployments/docker/scanner-worker.Dockerfile
+    working_dir: /app
+    volumes:
+      - ../:/app
+    environment:
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+
+volumes:
+  redis-data:

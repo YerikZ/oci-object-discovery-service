@@ -1,1 +1,5 @@
-Example job manifest
+jobs:
+  - name: logs-job
+    bucket: "app-logs"
+    prefixes: ["prod/", "shared/"]
+    frequency_minutes: 10

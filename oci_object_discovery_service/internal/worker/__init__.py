@@ -1,1 +1,0 @@
-Worker logic for scanning and processing objects

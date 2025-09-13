@@ -1,1 +1,18 @@
-Deployment for scanner worker
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scanner-worker
+  namespace: oci-ods
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: scanner-worker } }
+  template:
+    metadata: { labels: { app: scanner-worker } }
+    spec:
+      containers:
+        - name: scanner-worker
+          image: ghcr.io/example/oci-ods-worker:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: REDIS_HOST
+              value: redis

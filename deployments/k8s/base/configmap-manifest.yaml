@@ -1,1 +1,12 @@
-ConfigMap for manifests
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ods-manifests
+  namespace: oci-ods
+data:
+  example-catalogue.yaml: |
+    jobs:
+      - name: logs-job
+        bucket: "app-logs"
+        prefixes: ["prod/", "shared/"]
+        frequency_minutes: 10

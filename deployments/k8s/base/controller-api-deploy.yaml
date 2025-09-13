@@ -1,1 +1,41 @@
-Deployment for controller API
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: controller-api
+  namespace: oci-ods
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: controller-api } }
+  template:
+    metadata: { labels: { app: controller-api } }
+    spec:
+      containers:
+        - name: controller-api
+          image: ghcr.io/example/oci-ods-controller:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: REDIS_HOST
+              value: redis
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: manifests
+              mountPath: /app/manifests
+      volumes:
+        - name: manifests
+          configMap:
+            name: ods-manifests
+            items:
+              - key: example-catalogue.yaml
+                path: example-catalogue.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: controller-api
+  namespace: oci-ods
+spec:
+  selector: { app: controller-api }
+  ports:
+    - port: 80
+      targetPort: 8080

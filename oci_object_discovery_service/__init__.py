@@ -1,1 +1,1 @@
-Root package for oci_object_discovery_service
+'''OCI Object Discovery Service package.'''

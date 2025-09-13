@@ -1,1 +1,0 @@
-Scheduler logic, cron jobs, manifest handling

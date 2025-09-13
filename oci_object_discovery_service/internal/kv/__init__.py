@@ -1,1 +1,0 @@
-Key-value store abstraction and Redis implementation

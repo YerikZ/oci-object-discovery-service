@@ -1,1 +1,19 @@
-Ingress for controller API
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: controller-api
+  namespace: oci-ods
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: ods.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: controller-api
+                port:
+                  number: 80

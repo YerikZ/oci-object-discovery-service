@@ -1,35 +1,62 @@
-import json
-import os
-import redis
 from oci_object_discovery_service.internal import oci
+from oci_object_discovery_service.internal.db import (
+    objects_collection,
+    sessions_collection,
+)
+from datetime import datetime, timezone
+from oci_object_discovery_service.utils.logger import logger
+import time
 
-REDIS_HOST = os.getenv("REDIS_HOST", "redis")
-REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
-r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
-QUEUE_KEY = os.getenv("SCAN_QUEUE", "scan-queue")
-
-
-def process_task(task):
-    bucket = task["bucket"]
-    prefixes = task.get("prefixes", [])
-    print(f"[worker] Scanning bucket {bucket} prefixes={prefixes}")
+def process_task(task: dict):
+    bucket = task["job"]["bucket"]
+    prefixes = task["job"].get("prefixes", [])
+    logger.info(f"[worker] Scanning bucket {bucket} prefixes={prefixes}")
     objects = oci.list_objects(bucket, prefixes)
     count = 0
     for obj in objects:
-        key = f"obj:{bucket}:{obj['name']}"
-        r.set(key, json.dumps(obj))
+        objects_collection.update_one(
+            {
+                "bucket": bucket,
+                "name": obj["name"]
+            },
+            {"$set": {"metadata": obj,
+                      "updated_at": datetime.now(timezone.utc),
+                      "scan_id": task["_id"]
+                      }},
+            upsert=True,
+        )
         count += 1
-    print(f"[worker] Stored {count} objects in Redis")
+    sessions_collection.update_one(
+        {"_id": task["_id"]},
+        {
+            "$set": {
+                "status": "completed",
+                "completed_at": datetime.now(timezone.utc),
+                "object_count": count,
+            }
+        },
+    )
+    logger.info(f"[worker] Stored {count} objects in MongoDB for bucket {bucket}")
 
 
 def main():
-    print(f"[worker] listening on Redis list {QUEUE_KEY} at {REDIS_HOST}:{REDIS_PORT}")
+    logger.info(f"[worker] listening on MongoDB collection {sessions_collection.name}")
     while True:
-        task = r.blpop(QUEUE_KEY, timeout=5)
+        task = sessions_collection.find_one_and_update(
+            {"status": "pending"},
+            {
+                "$set": {
+                    "status": "in_progress",
+                    "started_at": datetime.now(timezone.utc),
+                }
+            },
+        )
         if task:
-            _, payload = task
-            process_task(json.loads(payload))
+            process_task(task)
+        else:
+            logger.info("[worker] no task found, sleeping...")
+            time.sleep(30)
 
 
 if __name__ == "__main__":

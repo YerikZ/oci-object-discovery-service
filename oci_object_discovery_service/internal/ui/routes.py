@@ -4,6 +4,7 @@ import json
 
 router = APIRouter()
 
+
 async def get_redis():
     return await redis.from_url("redis://redis:6379", decode_responses=True)
 

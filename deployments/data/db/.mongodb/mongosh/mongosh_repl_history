@@ -1,0 +1,52 @@
+exit
+).sort({ completed_at: -1 }).limit(1)
+db.scan_sessions.find()
+).sort({ completed_at: -1 }).limit(1)
+  { "job.bucket": "app-logs", status: "completed" }
+db.scan_sessions.find(
+)
+  { sort: { completed_at: -1 } }
+  { "job.bucket": "app-logs", status: "completed"},
+db.scan_sessions.findOne(
+)
+  { sort: { "completed_at": -1 } }
+  { "job.bucket": "app-logs" },
+db.scan_sessions.findOne(
+)
+  { sort: { completed_at: -1 } }
+  { "job.bucket": "app-logs" },
+db.scan_sessions.findOne(
+)
+  { sort: { completed_at: -1 } }
+  { "job.bucket": "xx" },
+db.scan_sessions.findOne(
+db.scan_sessions.find()
+db.objects.find()
+db.objects.deleteMany({})
+use ods
+db.objects.find()
+db.objects.deleteMany({})
+db.objects.deleteMany()
+db.objects.remove()
+db.objects.clear()
+db.objects.truncate()
+db.objects.find()
+use ods
+db.objects.find()
+db.scan_sessions.find()
+show collections
+use ods
+db.scan_sessions.find()
+use ods
+db.scan_sessions.find()
+show scan_sessions
+scan_sessions
+show collections
+show collection
+use ods
+show dbs
+show --help
+show -h
+show database
+show db
+ls db

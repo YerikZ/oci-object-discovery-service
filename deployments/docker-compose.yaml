@@ -1,13 +1,15 @@
 version: "3.8"
 name: ods
+
 services:
-  redis:
-    image: redis:7
-    command: ["redis-server", "--appendonly", "yes"]
-    volumes:
-      - redis-data:/data
+  mongo:
+    image: mongo:6
+    container_name: mongo_dev
+    restart: always
     ports:
-      - "6380:6379"
+      - "27017:27017"
+    volumes:
+      - ./data/db:/data/db
 
   controller-api:
     build:
@@ -17,11 +19,11 @@ services:
     volumes:
       - ../:/app
     environment:
-      - REDIS_HOST=redis
+      - MONGO_URI=mongodb://mongo:27017/ods
     ports:
       - "8080:8080"
     depends_on:
-      - redis
+      - mongo
 
   scheduler:
     build:
@@ -31,9 +33,9 @@ services:
     volumes:
       - ../:/app
     environment:
-      - REDIS_HOST=redis
+      - MONGO_URI=mongodb://mongo:27017/ods
     depends_on:
-      - redis
+      - mongo
 
   scanner-worker:
     build:
@@ -43,9 +45,9 @@ services:
     volumes:
       - ../:/app
     environment:
-      - REDIS_HOST=redis
+      - MONGO_URI=mongodb://mongo:27017/ods
     depends_on:
-      - redis
+      - mongo
 
   frontend:
     build:
@@ -58,7 +60,7 @@ services:
       - "3000:80"
     environment:
       # URL where React will call backend API
-      - REACT_APP_API_URL=http://localhost:8000/api/ui
+      - REACT_APP_API_URL=http://localhost:8080/api/ui
 
 volumes:
-  redis-data:
+  mongo-data:

@@ -1,13 +1,14 @@
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
-from oci_object_discovery_service.internal import manifest, queue
+from oci_object_discovery_service.internal import manifest, session
+from oci_object_discovery_service.utils.logger import logger
 
 
 def run_job(job):
-    print(
-        f"[scheduler] Enqueuing scan for bucket={job['bucket']} prefixes={job['prefixes']}"
+    logger.info(
+        f"[scheduler] Starting scan for bucket={job['bucket']} prefixes={job['prefixes']}"
     )
-    queue.enqueue(job)
+    session.create_session(job)
 
 
 def main():
@@ -23,7 +24,7 @@ def main():
             replace_existing=True,
         )
     scheduler.start()
-    print("[scheduler] started")
+    logger.info("[scheduler] started")
     try:
         while True:
             time.sleep(5)

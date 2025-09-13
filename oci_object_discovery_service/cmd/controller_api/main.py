@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from oci_object_discovery_service.internal import manifest, queue
+from oci_object_discovery_service.internal import manifest, session
 from oci_object_discovery_service.internal.ui.routes import router as ui_router
 
 app = FastAPI(title="OCI Object Discovery Service API")
@@ -25,7 +25,6 @@ def healthz():
 @app.post("/v1/manifests/reload")
 def reload_manifests():
     jobs = manifest.load_from_file("manifests/example-catalogue.yaml")
-    # In a real implementation, you might broadcast an update to the scheduler via queue/pubsub
     return {"jobs": [j["name"] for j in jobs]}
 
 
@@ -34,8 +33,8 @@ def trigger_scan():
     # Triggers an immediate scan for all jobs in the manifest
     jobs = manifest.load_from_file("manifests/example-catalogue.yaml")
     for j in jobs:
-        queue.enqueue(j)
-    return {"enqueued": len(jobs)}
+        session.create_session(j)
+    return {"Total Sessions Created": len(jobs)}
 
 
 if __name__ == "__main__":

@@ -9,7 +9,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ./data/db:/data/db
+      - mongo_data:/data/db
 
   controller-api:
     build:
@@ -63,4 +63,4 @@ services:
       - REACT_APP_API_URL=http://localhost:8080/api/ui
 
 volumes:
-  mongo-data:
+  mongo_data:

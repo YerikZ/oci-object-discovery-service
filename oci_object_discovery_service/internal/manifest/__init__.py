@@ -1,0 +1,1 @@
+YAML schema and manifest validation

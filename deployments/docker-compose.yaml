@@ -1,4 +1,5 @@
 version: "3.8"
+name: ods
 services:
   redis:
     image: redis:7
@@ -45,6 +46,19 @@ services:
       - REDIS_HOST=redis
     depends_on:
       - redis
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: deployments/docker/frontend.Dockerfile
+    container_name: ods-frontend
+    depends_on:
+      - controller-api
+    ports:
+      - "3000:80"
+    environment:
+      # URL where React will call backend API
+      - REACT_APP_API_URL=http://localhost:8000/api/ui
 
 volumes:
   redis-data:

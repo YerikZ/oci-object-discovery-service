@@ -1,1 +1,0 @@
-'''OCI Object Discovery Service package.'''

@@ -1,5 +1,7 @@
 jobs:
   - name: logs-job
+    oci_namespace: "your-namespace"
+    oci_region: "your-region"
     bucket: "app-logs"
     prefixes: ["prod/", "shared/"]
     frequency_minutes: 10

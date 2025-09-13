@@ -1,4 +1,5 @@
-import json, time, os
+import json
+import os
 import redis
 from oci_object_discovery_service.internal import oci
 
@@ -7,6 +8,7 @@ REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
 QUEUE_KEY = os.getenv("SCAN_QUEUE", "scan-queue")
+
 
 def process_task(task):
     bucket = task["bucket"]
@@ -20,6 +22,7 @@ def process_task(task):
         count += 1
     print(f"[worker] Stored {count} objects in Redis")
 
+
 def main():
     print(f"[worker] listening on Redis list {QUEUE_KEY} at {REDIS_HOST}:{REDIS_PORT}")
     while True:
@@ -27,6 +30,7 @@ def main():
         if task:
             _, payload = task
             process_task(json.loads(payload))
+
 
 if __name__ == "__main__":
     main()

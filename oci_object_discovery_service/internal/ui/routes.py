@@ -1,26 +1,38 @@
 from fastapi import APIRouter, Query
-import redis.asyncio as redis
-import json
+from motor.motor_asyncio import AsyncIOMotorClient
+from dotenv import load_dotenv
+import os
+import re
+from bson import ObjectId
+
+load_dotenv()
+database_uri = os.getenv("MONGO_URI", "mongodb://mongo:27017")
+database_name = os.getenv("DATABASE_NAME", "ods")
+objects_collection_name = os.getenv("OBJECTS_COLLECTION", "objects")
+sessions_collection_name = os.getenv("SESSIONS_COLLECTION", "scan_sessions")
 
 router = APIRouter()
+client = AsyncIOMotorClient(database_uri)
+db = client[database_name]
+objects_collection = db[objects_collection_name]
 
 
-async def get_redis():
-    return await redis.from_url("redis://redis:6379", decode_responses=True)
+def serialize_doc(doc):
+    """Recursively convert ObjectId to str in a MongoDB document."""
+    if isinstance(doc, list):
+        return [serialize_doc(d) for d in doc]
+    if isinstance(doc, dict):
+        return {k: serialize_doc(v) for k, v in doc.items()}
+    if isinstance(doc, ObjectId):
+        return str(doc)
+    return doc
 
 
 @router.get("/search")
-async def search_keys(q: str = Query(..., min_length=1)):
-    redis = await get_redis()
-    keys = await redis.keys(f"*{q}*")
-    return {"keys": keys[:10]}
-
-
-@router.get("/value/{key}")
-async def get_value(key: str):
-    redis = await get_redis()
-    val = await redis.get(key)
-    try:
-        return {"key": key, "value": json.loads(val)}
-    except Exception:
-        return {"key": key, "value": val}
+async def search_objects(q: str = Query(..., min_length=1)):
+    regex = re.escape(q)  # prevent regex injection
+    cursor = objects_collection.find(
+        {"name": {"$regex": regex, "$options": "i"}}
+    ).limit(50)
+    results = await cursor.to_list(length=50)
+    return {"results": serialize_doc(results)}

@@ -16,14 +16,14 @@ def process_task(task: dict):
     count = 0
     for obj in objects:
         objects_collection.update_one(
+            {"bucket": bucket, "name": obj["name"]},
             {
-                "bucket": bucket,
-                "name": obj["name"]
+                "$set": {
+                    "metadata": obj,
+                    "updated_at": datetime.now(timezone.utc),
+                    "scan_id": task["_id"],
+                }
             },
-            {"$set": {"metadata": obj,
-                      "updated_at": datetime.now(timezone.utc),
-                      "scan_id": task["_id"]
-                      }},
             upsert=True,
         )
         count += 1

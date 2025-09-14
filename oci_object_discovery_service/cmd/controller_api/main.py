@@ -7,7 +7,7 @@ from oci_object_discovery_service.internal.ui.routes import router as ui_router
 app = FastAPI(title="OCI Object Discovery Service API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # allow React UI to call
+    allow_origins=["*"],  # In production, specify allowed origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -19,6 +19,11 @@ app.include_router(ui_router, prefix="/api/ui", tags=["UI"])
 
 @app.get("/healthz")
 def healthz():
+    return {"status": "ok"}
+
+
+@app.get("/api/v1/ping")
+def ping():
     return {"status": "ok"}
 
 

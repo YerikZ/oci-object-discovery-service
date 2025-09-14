@@ -1,12 +1,17 @@
-FROM node:20 AS build
+FROM python:3.11-slim
+
+# set working directory
 WORKDIR /app
 
-COPY oci_object_discovery_service/frontend/package*.json ./
-RUN npm install
+# copy only requirements first for caching
+COPY oci_object_discovery_service/frontend/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r ./requirements.txt
 
-COPY oci_object_discovery_service/frontend/ ./
-RUN npm run build
+# copy full source tree
+COPY . .
 
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY oci_object_discovery_service/frontend/nginx.conf /etc/nginx/conf.d/default.conf
+# expose NiceGUI port
+EXPOSE 3000
+
+# run frontend as package module
+CMD ["python", "-m", "oci_object_discovery_service.frontend.app"]

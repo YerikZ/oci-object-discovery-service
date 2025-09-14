@@ -7,8 +7,11 @@ requires-python = ">=3.11"
 dependencies = [
     "aioredis>=2.0.1",
     "apscheduler>=3.11.0",
+    "bson>=0.5.10",
     "dotenv>=0.9.9",
     "fastapi>=0.116.1",
+    "motor>=3.7.1",
+    "nicegui>=2.24.1",
     "oci>=2.160.0",
     "pymongo>=4.15.0",
     "pyyaml>=6.0.2",

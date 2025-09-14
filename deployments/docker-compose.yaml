@@ -1,10 +1,9 @@
-version: "3.8"
 name: ods
 
 services:
   mongo:
     image: mongo:6
-    container_name: mongo_dev
+    container_name: ods-mongodb
     restart: always
     ports:
       - "27017:27017"
@@ -19,7 +18,7 @@ services:
     volumes:
       - ../:/app
     environment:
-      - MONGO_URI=mongodb://mongo:27017/ods
+      - MONGO_URI=mongodb://mongo:27017
     ports:
       - "8080:8080"
     depends_on:
@@ -33,7 +32,7 @@ services:
     volumes:
       - ../:/app
     environment:
-      - MONGO_URI=mongodb://mongo:27017/ods
+      - MONGO_URI=mongodb://mongo:27017
     depends_on:
       - mongo
 
@@ -45,7 +44,7 @@ services:
     volumes:
       - ../:/app
     environment:
-      - MONGO_URI=mongodb://mongo:27017/ods
+      - MONGO_URI=mongodb://mongo:27017
     depends_on:
       - mongo
 
@@ -53,14 +52,13 @@ services:
     build:
       context: ..
       dockerfile: deployments/docker/frontend.Dockerfile
-    container_name: ods-frontend
+    working_dir: /app
+    volumes:
+      - ../:/app
+    ports:
+      - "3000:3000"
     depends_on:
       - controller-api
-    ports:
-      - "3000:80"
-    environment:
-      # URL where React will call backend API
-      - REACT_APP_API_URL=http://localhost:8080/api/ui
 
 volumes:
   mongo_data:

@@ -3,7 +3,8 @@
 Components:
 - Controller API (FastAPI)
 - Scheduler (APScheduler)
-- Scanner Worker (Redis + stubbed OCI client)
+- Scanner Worker (stubbed OCI client)
+- Frontend (NiceGUI)
 
 ## Local (Docker Compose)
 ```bash

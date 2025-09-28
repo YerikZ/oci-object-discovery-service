@@ -6,7 +6,7 @@ from oci_object_discovery_service.utils.logger import logger
 
 def run_job(job):
     logger.info(
-        f"[scheduler] Starting scan for bucket={job['bucket']} prefixes={job['prefixes']}"
+        f"[scheduler] Starting job {job['name']} (every {job['frequency_minutes']} minutes)"
     )
     session.create_session(job)
 

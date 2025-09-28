@@ -4,6 +4,7 @@ Components:
 - Controller API (FastAPI)
 - Scheduler (APScheduler)
 - Scanner Worker (stubbed OCI client)
+- MongoDB (Database)
 - Frontend (NiceGUI)
 
 ## Local (Docker Compose)

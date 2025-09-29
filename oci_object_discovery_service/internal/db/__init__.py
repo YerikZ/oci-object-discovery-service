@@ -12,6 +12,7 @@ sessions_collection_name = os.getenv("SESSIONS_COLLECTION", "scan_sessions")
 
 client = MongoClient(mongo_uri)
 db = client[database_name]
+
 buckets_collection = db[buckets_collection_name]
 buckets_collection.create_index([("name", 1), ("namespace", 1)], unique=True)
 

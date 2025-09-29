@@ -28,6 +28,7 @@ def serialize_doc(doc):
         return str(doc)
     return doc
 
+
 @router.get("/objects")
 async def list_objects(
     bucket: str | None = Query(default=None),
@@ -56,10 +57,12 @@ async def list_objects(
         "has_more": skip + len(results) < total,
     }
 
+
 @router.get("/buckets")
 async def list_buckets():
     results = await buckets_collection.find().to_list(length=100)
     return {"results": serialize_doc(results)}
+
 
 @router.get("/search")
 async def search_objects(q: str = Query(..., min_length=1)):

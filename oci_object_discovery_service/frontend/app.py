@@ -24,7 +24,9 @@ async def fetch_buckets() -> List[str]:
     return data.get("results", [])
 
 
-async def fetch_objects(q: str | None = None, bucket: str | None = None, skip: int = 0, limit: int = 1000) -> Dict[str, Any]:
+async def fetch_objects(
+    q: str | None = None, bucket: str | None = None, skip: int = 0, limit: int = 1000
+) -> Dict[str, Any]:
     params: Dict[str, Any] = {"skip": skip, "limit": limit}
     if q and q.strip():
         params["q"] = q.strip()
@@ -32,7 +34,13 @@ async def fetch_objects(q: str | None = None, bucket: str | None = None, skip: i
         params["bucket"] = bucket.strip()
     data = await api_get("/objects", params=params)
     if "error" in data:
-        return {"results": [], "total": 0, "skip": skip, "limit": limit, "error": data["error"]}
+        return {
+            "results": [],
+            "total": 0,
+            "skip": skip,
+            "limit": limit,
+            "error": data["error"],
+        }
     return data
 
 
@@ -48,8 +56,13 @@ def top_nav(active: str = "home") -> None:
     with ui.header().classes("items-center justify-between"):
         ui.label("OCI Object Discovery Service").classes("text-xl font-semibold")
         with ui.row().classes("items-center gap-4"):
+
             def link(label: str, path: str, key: str):
-                style = "text-white font-bold" if key == active else "text-white/70 hover:text-white"
+                style = (
+                    "text-white font-bold"
+                    if key == active
+                    else "text-white/70 hover:text-white"
+                )
                 ui.link(label, path).classes(style)
 
             link("Home", "/", "home")
@@ -65,9 +78,7 @@ def home_page():
     with ui.column().classes("p-6 gap-2 max-w-3xl"):
         ui.label("Home").classes("text-lg font-medium")
         ui.separator()
-        ui.label(
-            "This is the home page. Add informational content here later."
-        )
+        ui.label("This is the home page. Add informational content here later.")
 
 
 @ui.page("/buckets")
@@ -87,7 +98,8 @@ def buckets_page():
         if total == 0:
             table.rows = []
             info.set_text("No buckets")
-            b_prev.disable(); b_next.disable()
+            b_prev.disable()
+            b_next.disable()
             return
         start = page_index * page_size
         end = start + page_size
@@ -111,9 +123,24 @@ def buckets_page():
 
         columns = [
             {"name": "name", "label": "Bucket Name", "field": "name", "align": "left"},
-            {"name": "namespace", "label": "Namespace", "field": "namespace", "align": "left"},
-            {"name": "size", "label": "Size (MB)", "field": "sizeInMB", "align": "right"},
-            {"name": "created", "label": "Created", "field": "timeCreated", "align": "left"},
+            {
+                "name": "namespace",
+                "label": "Namespace",
+                "field": "namespace",
+                "align": "left",
+            },
+            {
+                "name": "size",
+                "label": "Size (MB)",
+                "field": "sizeInMB",
+                "align": "right",
+            },
+            {
+                "name": "created",
+                "label": "Created",
+                "field": "timeCreated",
+                "align": "left",
+            },
         ]
         table = ui.table(columns=columns, rows=[]).classes("w-full")
         table.props("flat bordered")
@@ -133,8 +160,10 @@ def buckets_page():
                 status.set_text(f"Showing all ({len(filtered_rows)})")
             else:
                 filtered_rows = [
-                    r for r in rows_all
-                    if q in (r.get("name", "").lower()) or q in (r.get("namespace", "").lower())
+                    r
+                    for r in rows_all
+                    if q in (r.get("name", "").lower())
+                    or q in (r.get("namespace", "").lower())
                 ]
                 status.set_text(f"Filtered: {len(filtered_rows)} match(es)")
             page_index = 0
@@ -143,7 +172,15 @@ def buckets_page():
         async def load():
             nonlocal rows_all, filtered_rows, page_index
             buckets = await fetch_buckets()
-            rows_all = [{"name": b["name"], "namespace": b["namespace"], "sizeInMB": b["metadata"]["sizeInMB"], "timeCreated": b["metadata"]["timeCreated"]} for b in sorted(buckets, key=lambda x: x["name"])]
+            rows_all = [
+                {
+                    "name": b["name"],
+                    "namespace": b["namespace"],
+                    "sizeInMB": b["metadata"]["sizeInMB"],
+                    "timeCreated": b["metadata"]["timeCreated"],
+                }
+                for b in sorted(buckets, key=lambda x: x["name"])
+            ]
             filtered_rows = rows_all
             page_index = 0
             update_table()
@@ -165,8 +202,8 @@ def buckets_page():
         b_prev.on("click", lambda e: go_prev())
         b_next.on("click", lambda e: go_next())
         # search handlers
-        search_input.on('keydown.enter', apply_search)
-        search_btn.on('click', apply_search)
+        search_input.on("keydown.enter", apply_search)
+        search_btn.on("click", apply_search)
 
         ui.timer(0.1, load, once=True)
 
@@ -186,7 +223,7 @@ def objects_page():
     def to_row(obj: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "name": obj.get("name") or obj.get("path") or obj.get("key") or "",
-            "bucket": obj.get("bucket", ""),            
+            "bucket": obj.get("bucket", ""),
             "_raw": obj.get("metadata", {}).__repr__(),
         }
 
@@ -213,7 +250,9 @@ def objects_page():
         end = start + page_size
         objects_table.rows = filtered_rows[start:end]
         total_pages = (total + page_size - 1) // page_size
-        page_info.set_text(f"Page {page_index + 1} of {total_pages} · {total} result(s)")
+        page_info.set_text(
+            f"Page {page_index + 1} of {total_pages} · {total} result(s)"
+        )
         prev_btn.enable() if page_index > 0 else prev_btn.disable()
         next_btn.enable() if page_index < total_pages - 1 else next_btn.disable()
 
@@ -229,7 +268,9 @@ def objects_page():
             status.set_text("Loading…")
             data = await fetch_objects(q=None, bucket=None, skip=0, limit=1000)
             if data.get("error"):
-                status.set_text("Objects endpoint unavailable; enter a keyword to search")
+                status.set_text(
+                    "Objects endpoint unavailable; enter a keyword to search"
+                )
                 all_rows = []
             else:
                 all_rows = data.get("results", [])
@@ -245,15 +286,17 @@ def objects_page():
         with ui.row().classes("w-full items-end justify-between gap-3"):
             with ui.column().classes("gap-1"):
                 ui.label("Bucket filter")
-                bucket_select = ui.select(options=["All"], value="All").classes("min-w-[240px]")
+                bucket_select = ui.select(options=["All"], value="All").classes(
+                    "min-w-[240px]"
+                )
                 bucket_select.on_value_change(lambda e: apply_filters())
 
             with ui.column().classes("items-end gap-1"):
                 ui.label("Search")
                 with ui.row().classes("items-center gap-2"):
                     search_input = ui.input("Enter keyword")
-                    search_input.on('keydown.enter', do_search)
-                    ui.button('Search', on_click=do_search)
+                    search_input.on("keydown.enter", do_search)
+                    ui.button("Search", on_click=do_search)
 
         # table
         columns = [

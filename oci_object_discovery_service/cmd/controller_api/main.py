@@ -28,7 +28,7 @@ def ping():
 
 
 @app.post("/api/v1/manifests/reload")
-def reload_manifests():    
+def reload_manifests():
     jobs = manifest.load_from_file("manifests/example-catalogue.yaml")
     return {"jobs": [j["name"] for j in jobs]}
 
@@ -38,7 +38,7 @@ def trigger_scan():
     # Triggers an immediate scan for all jobs in the manifest
     jobs = manifest.load_from_file("manifests/example-catalogue.yaml")
     for j in jobs:
-        session.create_session(j)    
+        session.create_session(j)
     return {"Total Sessions Created": len(jobs)}
 
 

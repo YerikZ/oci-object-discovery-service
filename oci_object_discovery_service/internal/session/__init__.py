@@ -1,13 +1,8 @@
-from oci_object_discovery_service.internal.db import sessions_collection
-from datetime import datetime, timezone
+from oci_object_discovery_service.internal.db.repository import (
+    create_session as _create_session,
+)
 
 
 def create_session(job: dict) -> bool:
-    sessions_collection.insert_one(
-        {
-            "job": job,
-            "status": "pending",
-            "created_at": datetime.now(timezone.utc),
-        }
-    )
+    _create_session(job)
     return True

@@ -42,17 +42,23 @@ def list_buckets(namespace: str, region: str) -> list[dict]:
                 object_client.list_buckets, namespace, comp_id
             )
             for b in resp.data:
-                # Map to our expected metadata shape; some fields may be None
+                # Build a fixed, snake_case dict using known fields
                 time_created = getattr(b, "time_created", None)
-                lifecycle_state = getattr(b, "lifecycle_state", None)
+                api_data = {
+                    "compartment_id": comp_id,
+                    "created_by": getattr(b, "created_by", None),
+                    "defined_tags": getattr(b, "defined_tags", None),
+                    "etag": getattr(b, "etag", None),
+                    "freeform_tags": getattr(b, "freeform_tags", None),
+                    "name": getattr(b, "name", None),
+                    "namespace": namespace,
+                    "time_created": time_created.isoformat() if time_created else None,
+                }
                 results.append(
                     {
-                        "name": b.name,
-                        "namespace": namespace,
-                        "region": region,
-                        "compartmentId": comp_id,
-                        "timeCreated": time_created.isoformat() if time_created else None,
-                        "lifecycleState": getattr(lifecycle_state, "value", lifecycle_state),
+                        "name": api_data["name"],
+                        "namespace": api_data["namespace"],
+                        "data": api_data,
                     }
                 )
         except Exception as e:

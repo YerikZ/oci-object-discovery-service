@@ -21,7 +21,10 @@ def upsert_bucket(doc: BucketDoc) -> None:
 
 
 def find_active_buckets() -> Iterable[BucketDoc]:
-    cursor = buckets_collection.find({"metadata.lifecycleState": "ACTIVE"})
+    # Return all buckets; the real API payload does not expose lifecycleState
+    # as used previously under metadata.*. If needed, filter using fields in
+    # BucketDoc.data.
+    cursor = buckets_collection.find()
     for raw in cursor:
         yield BucketDoc.from_mongo(raw)  # type: ignore[return-value]
 

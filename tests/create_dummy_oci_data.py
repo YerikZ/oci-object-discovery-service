@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import io
+import os
 import sys
 import time
 from typing import List, Optional
@@ -9,6 +10,12 @@ from typing import List, Optional
 from oci.core import models as core_models  # type: ignore
 from oci.exceptions import ServiceError  # type: ignore
 from oci.object_storage import models as os_models  # type: ignore
+
+# Ensure project root is on sys.path when running from tests/
+# This allows `python tests/create_dummy_oci_data.py` or running inside tests/.
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
 from oci_object_discovery_service.internal.oci.auth import get_clients
 from oci_object_discovery_service.utils.logger import logger
@@ -125,4 +132,3 @@ def main(argv: Optional[List[str]] = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv[1:]))
-

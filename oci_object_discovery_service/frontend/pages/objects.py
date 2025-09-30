@@ -21,10 +21,16 @@ def objects_page():
     page_size = 10
 
     def to_row(obj: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            obj_size = obj.get("data", {}).get("size", 0)
+            size_mb = round(obj_size / (1024 * 1024), 4)
+        except Exception:
+            size_mb = 0
         return {
             "name": obj.get("name") or obj.get("path") or obj.get("key") or "",
             "bucket": obj.get("bucket", ""),
-            "_raw": obj.get("metadata", {}).__repr__(),
+            "data": obj.get("data", {}).__repr__(),
+            "sizeInMB": size_mb,
         }
 
     def apply_filters():
@@ -99,7 +105,8 @@ def objects_page():
         columns = [
             {"name": "name", "label": "Name", "field": "name", "align": "left"},
             {"name": "bucket", "label": "Bucket", "field": "bucket", "align": "left"},
-            {"name": "details", "label": "Metadata", "field": "_raw", "align": "left"},
+            {"name": "size", "label": "Size (MB)", "field": "sizeInMB", "align": "left"},
+            {"name": "details", "label": "Details", "field": "data", "align": "left"},
         ]
         objects_table = ui.table(columns=columns, rows=[]).classes("w-full")
         objects_table.props("flat bordered")
@@ -138,4 +145,3 @@ def objects_page():
             await do_search()
 
         ui.timer(0.05, init, once=True)
-

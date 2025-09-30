@@ -32,40 +32,18 @@ class Job(MongoBase):
     frequency_minutes: Optional[int] = None
 
 
-class BucketMetadata(BaseModel):
-    """Metadata for a bucket returned by OCI. Extra keys are allowed."""
-
-    model_config = ConfigDict(extra="allow")
-
-    compartmentId: Optional[str] = None
-    sizeInMB: Optional[int] = None
-    timeCreated: Optional[str] = None
-    lifecycleState: Optional[str] = None
-    etag: Optional[str] = None
-
-
 class BucketDoc(MongoBase):
     name: str
     namespace: str
-    metadata: BucketMetadata | dict[str, Any]
+    data: dict[str, Any]
     updated_at: Optional[datetime] = None
     scan_id: Optional[ObjectId] = None
-
-
-class ObjectMetadata(BaseModel):
-    """Metadata for an object returned by OCI. Extra keys are allowed."""
-
-    model_config = ConfigDict(extra="allow")
-
-    size: Optional[int] = None
-    etag: Optional[str] = None
-    contentType: Optional[str] = None
 
 
 class ObjectDoc(MongoBase):
     bucket: str
     name: str
-    metadata: ObjectMetadata | dict[str, Any]
+    data: dict[str, Any]
     updated_at: Optional[datetime] = None
     scan_id: Optional[ObjectId] = None
 

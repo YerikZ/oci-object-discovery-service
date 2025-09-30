@@ -53,9 +53,15 @@ def buckets_page():
             },
             {
                 "name": "size",
-                "label": "Size (MB)",
-                "field": "sizeInMB",
+                "label": "Size (GB)",
+                "field": "sizeInGB",
                 "align": "right",
+            },
+            {
+                "name": "data",
+                "label": "Details",
+                "field": "data",
+                "align": "left",
             },
             {
                 "name": "created",
@@ -94,15 +100,24 @@ def buckets_page():
         async def load():
             nonlocal rows_all, filtered_rows, page_index
             buckets = await fetch_buckets()
-            rows_all = [
-                {
-                    "name": b["name"],
-                    "namespace": b["namespace"],
-                    "sizeInMB": b["metadata"]["sizeInMB"],
-                    "timeCreated": b["metadata"]["timeCreated"],
+            def to_row(b: Dict[str, Any]) -> Dict[str, Any]:
+                data = b.get("data", {}) if isinstance(b, dict) else {}
+                size_gb = None
+                try:
+                    size_bytes = data.get("approximate_size")
+                    if size_bytes is not None:
+                        size_gb = round(float(size_bytes) / (1024 * 1024), 2)
+                except Exception:
+                    size_gb = None
+                return {
+                    "name": b.get("name"),
+                    "namespace": b.get("namespace"),
+                    "sizeInGB": size_gb,
+                    "data": str(data),
+                    "timeCreated": data.get("time_created"),
                 }
-                for b in sorted(buckets, key=lambda x: x["name"])
-            ]
+
+            rows_all = [to_row(b) for b in sorted(buckets, key=lambda x: x.get("name"))]
             filtered_rows = rows_all
             page_index = 0
             update_table()
@@ -127,4 +142,3 @@ def buckets_page():
         search_btn.on("click", apply_search)
 
         ui.timer(0.1, load, once=True)
-

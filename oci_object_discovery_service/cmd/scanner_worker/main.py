@@ -24,7 +24,7 @@ def run_task_list_buckets(task: dict):
         doc = BucketDoc(
             name=bucket["name"],
             namespace=bucket["namespace"],
-            metadata=bucket,
+            data=bucket.get("data", bucket),
             updated_at=datetime.now(timezone.utc),
             scan_id=task["_id"],
         )
@@ -52,9 +52,9 @@ def run_task_list_objects(task: dict):
 
         for obj in objects:
             doc = ObjectDoc(
-                bucket=obj["bucket"],
-                name=obj["name"],
-                metadata=obj,
+                bucket=bucket_name,
+                name=obj.get("name"),
+                data=obj,
                 updated_at=datetime.now(timezone.utc),
                 scan_id=task.get("_id"),
             )

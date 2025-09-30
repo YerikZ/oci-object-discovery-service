@@ -43,8 +43,12 @@ services:
     working_dir: /app
     volumes:
       - ../:/app
+      # Mount your local OCI config into the container
+      - ~/.oci:/root/.oci:ro
+      - ~/.ssh/oci_yilinzhu_20250930.pem:/root/.ssh/oci_yilinzhu_20250930.pem:ro
     environment:
       - MONGO_URI=mongodb://mongo:27017
+      - OCI_CLI_CONFIG_FILE=/root/.oci/config
     depends_on:
       - mongo
 

@@ -1,12 +1,12 @@
 jobs:
   - name: list-buckets    
-    oci_tenancy_name: "your-tenancy-name"
-    oci_namespace: "your-namespace"
-    oci_region: "your-region"    
+    oci_tenancy_name: "your_tenancy_name"
+    oci_namespace: "your_namespace"
+    oci_region: "uk-london-1"    
     frequency_minutes: 5
 
   - name: list-objects
-    oci_tenancy_name: "your-tenancy-name"
-    oci_namespace: "your-namespace"
-    oci_region: "your-region"
+    oci_tenancy_name: "your_tenancy_name"
+    oci_namespace: "your_namespace"
+    oci_region: "uk-london-1"
     frequency_minutes: 5

@@ -13,7 +13,7 @@ def run_job(job):
 
 def main():
     scheduler = BackgroundScheduler()
-    jobs = manifest.load_from_file("manifests/example-catalogue.yaml")
+    jobs = manifest.load_from_file("manifests/catalogue.yaml")
     for job in jobs:
         scheduler.add_job(
             run_job,

@@ -22,11 +22,11 @@ from datetime import datetime, timezone
 from oci_object_discovery_service.internal.db.models import BucketDoc
 from oci_object_discovery_service.internal.db.repository import upsert_bucket
 
-payload = {"name": "b1", "namespace": "ns", "sizeInMB": 10}
+payload = {"name": "b1", "namespace": "ns", "approximate_size": 10_485_760}
 doc = BucketDoc(
     name=payload["name"],
     namespace=payload["namespace"],
-    metadata=payload,
+    data=payload,
     updated_at=datetime.now(timezone.utc),
 )
 upsert_bucket(doc)

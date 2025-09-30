@@ -61,10 +61,14 @@ async def fetch_metrics() -> Dict[str, Any]:
     """
     buckets = await fetch_buckets()
     bucket_count = len(buckets)
+    
     total_size_mb = 0.0
     for b in buckets:
         try:
-            total_size_mb += float(b.get("metadata", {}).get("sizeInMB", 0) or 0)
+            size_bytes = b.get("data", {}).get("approximate_size")
+            if size_bytes is None:
+                continue
+            total_size_mb += float(size_bytes) / (1024 * 1024)
         except Exception:
             continue
 
